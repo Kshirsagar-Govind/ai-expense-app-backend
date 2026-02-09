@@ -10,7 +10,7 @@ const app = express();
 // CORS first so preflight and all responses get headers
 // Use a specific origin for development to allow credentials.
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173',"https://expense-app-frontend-rdlg0wcbf-kshirsagargovinds-projects.vercel.app"],
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
