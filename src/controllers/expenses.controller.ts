@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import {Response } from "express";
+import {AuthRequest as Request} from '../middlewares/verifyToken'
 import { StatusCodes } from "http-status-codes";
 import { Expense } from "../models";
 import openai from "../utils/openai";

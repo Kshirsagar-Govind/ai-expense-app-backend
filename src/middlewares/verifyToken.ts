@@ -9,14 +9,12 @@ export interface IUser {
   email?: string;
 }
 
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: IUser;
-  }
+export interface AuthRequest extends Request {
+  user?: IUser;
 }
 
 export const authenticateUser = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -31,38 +29,26 @@ export const authenticateUser = async (
 
     const token = authHeader.split(" ")[1];
 
-    if (!token) {
+    const decoded = verifyToken(token) as TokenPayload;
+
+    const user = await User.findByPk(decoded.id);
+
+    if (!user) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
-        .json({ msg: "Token not provided" });
+        .json({ msg: "User not found. Token may be invalid." });
     }
 
-    try {
-      const decoded = verifyToken(token) as TokenPayload;
+    req.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
 
-      // Optionally verify user still exists in database
-      const user = await User.findByPk(decoded.id);
-
-      if (!user) {
-        return res
-          .status(StatusCodes.UNAUTHORIZED)
-          .json({ msg: "User not found. Token may be invalid." });
-      }
-
-      req.user = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      };
-      next();
-    } catch (error) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ msg: "Invalid or expired token" });
-    }
+    next();
   } catch (error) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
-      .json({ msg: "Authentication failed" });
+      .json({ msg: "Invalid or expired token" });
   }
 };
