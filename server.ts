@@ -2,6 +2,10 @@ import { configDotenv } from "dotenv";
 import sequelize from "./src/config/db";
 import app from "./src";
 
+export const config = {
+  runtime: "nodejs"
+};
+
 configDotenv();
 
 const PORT = 5000;
